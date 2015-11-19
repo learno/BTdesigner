@@ -14,12 +14,31 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using Behaviac.Design;
 using Behaviac.Design.Nodes;
-using Behaviac.Design.Attributes;
+using Behaviac.Design.Attachments;
+using PluginBehaviac.DataExporters;
+using PluginBehaviac.Events;
 
-namespace Behaviac.Design.ObjectUI
+namespace PluginBehaviac.NodeExporters
 {
-    class BehaviorUIPolicy : ObjectUIPolicy
+    public class WaitTransitionCsExporter : AttachmentCsExporter
     {
+        protected override bool ShouldGenerateClass()
+        {
+            return true;
+        }
+
+        protected override void GenerateConstructor(Attachment attachment, StreamWriter stream, string indent, string className)
+        {
+            base.GenerateConstructor(attachment, stream, indent, className);
+
+            WaitTransition waitTransition = attachment as WaitTransition;
+            if (waitTransition == null)
+                return;
+
+            stream.WriteLine("{0}\t\t\tthis.TargetStateId = {1};", indent, waitTransition.TargetFSMNodeId);
+        }
     }
 }
