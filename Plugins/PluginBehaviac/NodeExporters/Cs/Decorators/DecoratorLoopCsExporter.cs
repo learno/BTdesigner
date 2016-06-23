@@ -14,34 +14,31 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using Behaviac.Design;
 using Behaviac.Design.Nodes;
-using PluginBehaviac.Properties;
-using Behaviac.Design.Attributes;
+using PluginBehaviac.Nodes;
+using PluginBehaviac.DataExporters;
 
-namespace PluginBehaviac.Nodes
+namespace PluginBehaviac.NodeExporters
 {
-    [NodeDesc("Decorators", "repeat_icon")]
-    public class DecoratorRepeat : DecoratorCount
-	{
-		public DecoratorRepeat() : base(Resources.DecoratorRepeat, Resources.DecoratorRepeatDesc)
-		{
-            this._count = new VariableDef((int)1);
-		}
-
-        public override string DocLink
+    public class DecoratorLoopCsExporter : DecoratorCountCsExporter
+    {
+        protected override bool ShouldGenerateClass(Node node)
         {
-            get { return "http://www.behaviac.com/language/zh/decorator/#repeat"; }
+            DecoratorLoop decoratorLoop = node as DecoratorLoop;
+            return (decoratorLoop != null);
         }
 
-        public override string ExportClass
+        protected override void GenerateConstructor(Node node, StreamWriter stream, string indent, string className)
         {
-            get { return "DecoratorRepeat"; }
-        }
+            base.GenerateConstructor(node, stream, indent, className);
 
-        public override void CheckForErrors(BehaviorNode rootBehavior, List<ErrorCheck> result)
-        {
-            base.CheckForErrors(rootBehavior, result);
+            DecoratorLoop decoratorLoop = node as DecoratorLoop;
+            if (decoratorLoop == null)
+                return;
+
+            stream.WriteLine("{0}\t\t\tm_bDoneWithinFrame = {1};", indent, decoratorLoop.DoneWithinFrame ? "true" : "false");
         }
-	}
+    }
 }
